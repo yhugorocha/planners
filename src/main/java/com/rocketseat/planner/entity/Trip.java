@@ -1,6 +1,6 @@
 package com.rocketseat.planner.entity;
 
-import com.rocketseat.planner.record.TripResquest;
+import com.rocketseat.planner.record.trip.TripResquest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.rocketseat.planner.record;
+package com.rocketseat.planner.record.trip;
 
 import java.util.List;
 
