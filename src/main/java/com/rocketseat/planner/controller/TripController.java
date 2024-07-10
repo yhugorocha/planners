@@ -1,8 +1,8 @@
 package com.rocketseat.planner.controller;
 
-import com.rocketseat.planner.entity.Trip;
-import com.rocketseat.planner.record.TripResponse;
-import com.rocketseat.planner.record.TripResquest;
+import com.rocketseat.planner.record.participant.ParticipantRequest;
+import com.rocketseat.planner.record.trip.TripResponse;
+import com.rocketseat.planner.record.trip.TripResquest;
 import com.rocketseat.planner.service.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +24,22 @@ public class TripController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Trip> getTripDatails(@PathVariable UUID id){
+    public ResponseEntity<TripResponse> getTripDatails(@PathVariable UUID id){
         return tripService.getTrip(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TripResponse> updateTrip(@PathVariable UUID id, @RequestBody TripResquest tripResquest){
+        return tripService.updateTrip(id, tripResquest).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/participants")
+    public ResponseEntity<TripResponse> inviteToTrip(@PathVariable UUID id, @RequestBody ParticipantRequest participantRequest){
+        return tripService.inviteToTrip(id, participantRequest).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/confirm")
+    public ResponseEntity<TripResponse> confirmedTrip(@PathVariable UUID id){
+        return tripService.confirmedTrip(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
