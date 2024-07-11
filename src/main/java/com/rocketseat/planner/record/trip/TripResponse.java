@@ -8,6 +8,7 @@ public record TripResponse(UUID id,
                            String destination,
                            LocalDateTime starts_at,
                            LocalDateTime ends_at,
+                           Boolean is_confirmed,
                            String owner_name,
                            String owner_email) {
 
