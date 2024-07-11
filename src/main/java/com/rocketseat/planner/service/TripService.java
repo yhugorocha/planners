@@ -1,18 +1,17 @@
 package com.rocketseat.planner.service;
 
+import com.rocketseat.planner.entity.Participant;
 import com.rocketseat.planner.entity.Trip;
 import com.rocketseat.planner.record.participant.ParticipantRequest;
+import com.rocketseat.planner.record.participant.ParticipantResponse;
 import com.rocketseat.planner.record.trip.TripResponse;
 import com.rocketseat.planner.record.trip.TripResquest;
 import com.rocketseat.planner.repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,17 +28,12 @@ public class TripService {
         Trip newTrip = new Trip(tripResquest);
         this.tripRepository.save(newTrip);
         this.participantService.registerParticipantsToEvent(tripResquest.email_to_invite(), newTrip);
-        TripResponse response = new TripResponse(newTrip.getId(),
-                                                newTrip.getDestination(),
-                                                newTrip.getStartsAt(),
-                                                newTrip.getEndsAt(),
-                                                newTrip.getOwnerName(),
-                                                newTrip.getOwnerEmail());
+        TripResponse response = new TripResponse(newTrip.getId(), newTrip.getDestination(), newTrip.getStartsAt(), newTrip.getEndsAt(), newTrip.getIsConfirmed(), newTrip.getOwnerName(), newTrip.getOwnerEmail());
         return response;
     }
 
     public Optional<TripResponse> getTrip(UUID idTrip) {
-        return tripRepository.findById(idTrip).map(t -> new TripResponse(t.getId(), t.getDestination(), t.getStartsAt(), t.getEndsAt(), t.getOwnerName(), t.getOwnerEmail()));
+        return tripRepository.findById(idTrip).map(t -> new TripResponse(t.getId(), t.getDestination(), t.getStartsAt(), t.getEndsAt(), t.getIsConfirmed(), t.getOwnerName(), t.getOwnerEmail()));
     }
 
     public Optional<TripResponse> updateTrip(UUID id, TripResquest tripResquest) {
@@ -51,7 +45,7 @@ public class TripService {
             t.setOwnerEmail(tripResquest.owner_email());
 
             this.tripRepository.save(t);
-            return new TripResponse(t.getId(),t.getDestination(), t.getStartsAt(), t.getEndsAt(), t.getOwnerName(), t.getOwnerEmail());
+            return new TripResponse(t.getId(),t.getDestination(), t.getStartsAt(), t.getEndsAt(), t.getIsConfirmed(),t.getOwnerName(), t.getOwnerEmail());
         });
 
         return tripResponse;
@@ -61,20 +55,20 @@ public class TripService {
         Optional<TripResponse> tripResquest = this.tripRepository.findById(id).map(t -> {
             t.setIsConfirmed(true);
             this.tripRepository.save(t);
-            return new TripResponse(t.getId(),t.getDestination(), t.getStartsAt(), t.getEndsAt(), t.getOwnerName(), t.getOwnerEmail());
+            return new TripResponse(t.getId(),t.getDestination(), t.getStartsAt(), t.getEndsAt(), t.getIsConfirmed(), t.getOwnerName(), t.getOwnerEmail());
         });
 
         return tripResquest;
     }
 
-    public Optional<TripResponse> inviteToTrip(UUID id, ParticipantRequest participantRequest) {
-        List<String> list = new ArrayList<>();
-        list.add(participantRequest.email());
-        Optional<TripResponse> tripResponse = this.tripRepository.findById(id).map(t -> {
-            this.participantService.registerParticipantsToEvent(list, t);
-            return new TripResponse(t.getId(),t.getDestination(), t.getStartsAt(), t.getEndsAt(), t.getOwnerName(), t.getOwnerEmail());
+    public Optional<ParticipantResponse> inviteToTrip(UUID id, ParticipantRequest participantRequest) {
+        Optional<ParticipantResponse> participantResponse = this.tripRepository.findById(id).map(t -> {
+            Participant participant = this.participantService.registerParticipantToEvent(participantRequest.email(), t);
+            if(t.getIsConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(participantRequest.email());
+            System.out.println(participant.getId());
+            return new ParticipantResponse(participant.getId(), participant.getEmail(), t.getId());
         });
 
-        return tripResponse;
+        return participantResponse;
     }
 }
