@@ -1,9 +1,36 @@
 package com.rocketseat.planner.record.participant;
 
-import com.rocketseat.planner.entity.Trip;
-import com.rocketseat.planner.record.trip.TripResponse;
+import com.rocketseat.planner.entity.Participant;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-public record ParticipantResponse(UUID id, String name, String email, Boolean isConfirmed, Trip trip) {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ParticipantResponse {
+
+    private UUID id;
+    private String name;
+    private String email;
+    private Boolean isConfirmed;
+    private UUID tripId;
+
+    public ParticipantResponse(UUID id, String email, UUID tripId){
+        this.id = id;
+        this.name = "";
+        this.email = email;
+        this.isConfirmed = false;
+        this.tripId = tripId;
+    }
+
+    public ParticipantResponse (Participant participant){
+        this.id = participant.getId();
+        this.name = participant.getName();
+        this.email = participant.getEmail();
+        this.isConfirmed = participant.getIsConfirmed();
+        this.tripId = participant.getTrip().getId();
+    }
 }
