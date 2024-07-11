@@ -24,16 +24,33 @@ public class ParticipantService {
         System.out.println(participants.get(0).getId());
     }
 
+    public Participant registerParticipantToEvent(String email, Trip trip){
+        Participant participant = new Participant(email, trip);
+        return participantRepository.save(participant);
+    }
+
+
+
     public Optional<ParticipantResponse> saveToConfirmationEmail(UUID id, ParticipantRequest participant) {
-        System.out.println("Chamou");
         Optional<ParticipantResponse> participantResponse = this.participantRepository.findById(id).map(p -> {
                                                     p.setName(participant.name());
                                                     p.setIsConfirmed(true);
                                                     this.participantRepository.save(p);
-                                                    return new ParticipantResponse(p.getId(), p.getName(), p.getEmail(), p.getIsConfirmed(), p.getTrip());
+                                                    return new ParticipantResponse(p.getId(), p.getName(), p.getEmail(), p.getIsConfirmed(), p.getTrip().getId());
         });
 
         return participantResponse;
     }
 
+    public void triggerConfirmationEmailToParticipants(UUID id) {
+
+    }
+
+    public void triggerConfirmationEmailToParticipant(String email) {
+
+    }
+
+    public List<Participant> getParticipantsToTripId(UUID idTrip){
+        return this.participantRepository.findByTripId(idTrip);
+    }
 }
